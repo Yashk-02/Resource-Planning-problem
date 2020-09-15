@@ -1,0 +1,35 @@
+model "I-1 Personnel assignment"
+uses "mmxprs"
+
+
+declarations
+ STAFF = 1..4 !  4 Staffs
+ DEPT = 1..4 !  4 Departments
+
+
+ OUTP: array(STAFF,DEPT) of integer ! Productivity
+end-declarations
+
+
+initialisations from 'Matrix1.dat'
+  OUTP
+end-initialisations
+
+! **** solution for Staff assignment ****
+
+declarations
+assign: array(STAFF,DEPT) of mpvar      ! Decision variable
+end-declarations
+
+! Objective: total productivity
+TotalProd:= sum(s in STAFF, d in DEPT) OUTP(s,d)*assign(s,d)
+
+! One Department per staff
+ forall(s in STAFF) sum(d in DEPT) assign(s,d) <=1
+
+! One staff per Department
+  forall(d in DEPT) sum(s in STAFF) assign(s,d) >= 1
+
+! Solve the problem
+  maximize(TotalProd)
+  writeln("Maximised sale of the company with 4 staff and 4 departments: ", getobjval)
